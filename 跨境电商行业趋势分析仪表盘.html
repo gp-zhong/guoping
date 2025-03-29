@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨境电商行业趋势分析 | 数据仪表盘</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-secondary: #3b82f6;
+            --color-tertiary: #60a5fa;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-info: #6366f1;
+            --color-dark: #1e293b;
+            --color-light: #f8fafc;
+            --color-gray: #64748b;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+        
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        
+        .trend-up {
+            color: var(--color-success);
+        }
+        
+        .trend-down {
+            color: var(--color-danger);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.875rem;
+            color: #475569;
+        }
+        
+        td {
+            padding: 0.75rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.875rem;
+        }
+        
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: white;
+        }
+        
+        /* 确保图表颜色对色盲友好 */
+        .colorblind-friendly {
+            --chart-color-1: #2563eb; /* 蓝色 */
+            --chart-color-2: #10b981; /* 绿色 */
+            --chart-color-3: #ef4444; /* 红色 */
+            --chart-color-4: #f59e0b; /* 橙色 */
+            --chart-color-5: #8b5cf6; /* 紫色 */
+            --chart-color-6: #ec4899; /* 粉色 */
+            --chart-color-7: #6366f1; /* 靛蓝色 */
+            --chart-color-8: #14b8a6; /* 青绿色 */
+        }
+    </style>
+</head>
+<body class="colorblind-friendly">
+    <div class="dashboard-container p-4 md:p-6">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">跨境电商行业趋势分析</h1>
+            <p class="text-gray-600">全面分析全球跨境电商市场动态，洞察行业发展趋势</p>
+            
+            <div class="filter-container mt-4">
+                <select class="filter-select" id="yearFilter">
+                    <option value="2023">2023年</option>
+                    <option value="2022">2022年</option>
+                    <option value="2021">2021年</option>
+                </select>
+                
+                <select class="filter-select" id="regionFilter">
+                    <option value="global">全球</option>
+                    <option value="asia">亚洲</option>
+                    <option value="europe">欧洲</option>
+                    <option value="namerica">北美</option>
+                </select>
+            </div>
+        </header>
+        
+        <!-- 关键指标概览 -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">关键指标概览</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="card stat-card">
+                    <div class="stat-value text-primary" style="color: var(--color-primary);">$2.84T</div>
+                    <div class="stat-label">全球交易总额</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up mr-1"></i> 16.8%
+                    </div>
+                </div>
+                
+                <div class="card stat-card">
+                    <div class="stat-value" style="color: var(--color-success);">24.7亿</div>
+                    <div class="stat-label">活跃用户数</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up mr-1"></i> 12.3%
+                    </div>
+                </div>
+                
+                <div class="card stat-card">
+                    <div class="stat-value" style="color: var(--color-tertiary);">43.2%</div>
+                    <div class="stat-label">移动端占比</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up mr-1"></i> 5.7%
+                    </div>
+                </div>
+                
+                <div class="card stat-card">
+                    <div class="stat-value" style="color: var(--color-warning);">$42.5</div>
+                    <div class="stat-label">平均客单价</div>
+                    <div class="stat-trend trend-down">
+                        <i class="fas fa-arrow-down mr-1"></i> 2.1%
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 市场规模趋势 -->
+        <section class="mb-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">全球跨境电商市场规模趋势</h2>
+                    <div class="flex">
+                        <button class="tab-button active" data-period="quarterly">季度</button>
+                        <button class="tab-button" data-period="monthly">月度</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="marketSizeChart"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i> 数据显示市场规模持续增长，Q4季节性峰值明显，年增长率保持在15%以上
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 区域分布与品类表现 -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- 区域分布 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">区域市场份额分布</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="regionChart"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i> 亚太地区占据最大市场份额，欧洲市场增长迅速
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 品类表现 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">主要品类销售表现</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i> 电子产品和时尚类目持续领先，家居用品增长显著
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 平台竞争格局 -->
+        <section class="mb-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">主要电商平台市场份额对比</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="platformChart"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i> 亚马逊保持领先地位，但区域性平台竞争力逐渐增强
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 用户行为分析 -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- 支付方式 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">支付方式偏好</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i> 信用卡仍是主要支付方式，但数字钱包增长迅速
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 购物设备 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">购物设备使用趋势</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="deviceChart"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i> 移动端购物占比逐年提升，平板电脑使用率下降
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 热门市场分析表格 -->
+        <section class="mb-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">热门跨境电商市场分析</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>国家/地区</th>
+                                    <th>市场规模 (亿美元)</th>
+                                    <th>年增长率</th>
+                                    <th>电商渗透率</th>
+                                    <th>主要品类</th>
+                                    <th>潜力评级</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-medium">美国</td>
+                                    <td>7,640</td>
+                                    <td>14.2%</td>
+                                    <td>67.3%</td>
+                                    <td>电子、时尚、家居</td>
+                                    <td>
+                                        <div class="flex text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium">中国</td>
+                                    <td>6,380</td>
+                                    <td>21.8%</td>
+                                    <td>58.2%</td>
+                                    <td>奢侈品、美妆、婴幼儿</td>
+                                    <td>
+                                        <div class="flex text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium">英国</td>
+                                    <td>1,920</td>
+                                    <td>11.6%</td>
+                                    <td>71.4%</td>
+                                    <td>时尚、食品、电子</td>
+                                    <td>
+                                        <div class="flex text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium">德国</td>
+                                    <td>1,580</td>
+                                    <td>10.2%</td>
+                                    <td>62.7%</td>
+                                    <td>电子、家居、健康</td>
+                                    <td>
+                                        <div class="flex text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium">印度</td>
+                                    <td>980</td>
+                                    <td>27.6%</td>
+                                    <td>31.8%</td>
+                                    <td>电子、时尚、美妆</td>
+                                    <td>
+                                        <div class="flex text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium">巴西</td>
+                                    <td>740</td>
+                                    <td>19.5%</td>
+                                    <td>35.6%</td>
+                                    <td>电子、玩具、时尚</td>
+                                    <td>
+                                        <div class="flex text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="font-medium">日本</td>
+                                    <td>1,340</td>
+                                    <td>9.2%</td>
+                                    <td>53.9%</td>
+                                    <td>美妆、食品、电子</td>
+                                    <td>
+                                        <div class="flex text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 行业挑战与机遇 -->
+        <section class="mb-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">跨境电商行业挑战与机遇评估</h2>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i> 物流效率和新兴市场仍有较大发展空间，监管合规成为重要考量因素
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 研究结论 -->
+        <section class="mb-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">关键洞察与趋势预测</h2>
+                </div>
+                <div class="card-body">
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="font-semibold text-gray-800 mb-2">主要发现</h3>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                                <li>全球跨境电商市场规模保持两位数增长，预计2025年将突破3.5万亿美元</li>
+                                <li>亚太地区仍是最大市场，但东南亚、拉美等新兴市场增速更快</li>
+                                <li>大型平台占据主导地位，但区域性平台通过本地化战略迅速崛起</li>
+                                <li>移动购物比例持续提升，社交媒体对购物决策的影响力增强</li>
+                                <li>支付方式多元化，数字钱包和加密货币等新型支付方式增长显著</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-semibold text-gray-800 mb-2">未来趋势</h3>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                                <li>跨境物流基础设施投资将加大，缩短配送时间成为核心竞争力</li>
+                                <li>新兴市场将成为增长的主要驱动力，特别是东南亚、印度和非洲市场</li>
+                                <li>AI和个性化技术将提升购物体验，降低语言和文化障碍</li>
+                                <li>监管环境趋严，合规和税务问题将对行业格局产生重大影响</li>
+                                <li>可持续发展成为消费者关注焦点，环保物流和包装将成为竞争优势</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-semibold text-gray-800 mb-2">战略建议</h3>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-700">
+                                <li>加强本地化战略，针对不同市场定制产品选择和营销方式</li>
+                                <li>优化跨境物流解决方案，提高配送速度和透明度</li>
+                                <li>投资移动端购物体验，简化支付流程和界面</li>
+                                <li>建立合规框架，应对各地区不断变化的监管要求</li>
+                                <li>拓展多元化平台布局，降低对单一渠道的依赖</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // 使用对色盲友好的颜色方案
+        const colorPalette = [
+            'rgba(37, 99, 235, 0.8)',   // 蓝色
+            'rgba(16, 185, 129, 0.8)',  // 绿色
+            'rgba(239, 68, 68, 0.8)',   // 红色
+            'rgba(245, 158, 11, 0.8)',  // 橙色
+            'rgba(139, 92, 246, 0.8)',  // 紫色
+            'rgba(236, 72, 153, 0.8)',  // 粉色
+            'rgba(99, 102, 241, 0.8)',  // 靛蓝色
+            'rgba(20, 184, 166, 0.8)'   // 青绿色
+        ];
+        
+        const borderColorPalette = [
+            'rgba(37, 99, 235, 1)',
+            'rgba(16, 185, 129, 1)',
+            'rgba(239, 68, 68, 1)',
+            'rgba(245, 158, 11, 1)',
+            'rgba(139, 92, 246, 1)',
+            'rgba(236, 72, 153, 1)',
+            'rgba(99, 102, 241, 1)',
+            'rgba(20, 184, 166, 1)'
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. 全球跨境电商市场规模趋势图
+            const marketSizeCtx = document.getElementById('marketSizeChart').getContext('2d');
+            const marketSizeChart = new Chart(marketSizeCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2021', 'Q2 2021', 'Q3 2021', 'Q4 2021', 'Q1 2022', 'Q2 2022', 'Q3 2022', 'Q4 2022', 'Q1 2023', 'Q2 2023'],
+                    datasets: [{
+                        label: '市场规模 (十亿美元)',
+                        data: [620, 645, 678, 742, 715, 740, 782, 860, 840, 875],
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderColor: 'rgba(37, 99, 235, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(37, 99, 235, 1)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value + 'B';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return '市场规模: $' + context.raw + '十亿';
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // 2. 区域市场份额分布饼图
+            const regionCtx = document.getElementById('regionChart').getContext('2d');
+            const regionChart = new Chart(regionCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['亚太地区', '北美', '欧洲', '拉丁美洲', '中东非洲'],
+                    datasets: [{
+                        data: [42, 25, 21, 8, 4],
+                        backgroundColor: colorPalette,
+                        borderColor: borderColorPalette,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 3. 主要品类销售表现
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            const categoryChart = new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['电子产品', '时尚服饰', '美妆个护', '家居园艺', '玩具爱好', '健康保健'],
+                    datasets: [{
+                        label: '销售额 (十亿美元)',
+                        data: [980, 720, 510, 380, 260, 190],
+                        backgroundColor: colorPalette,
+                        borderColor: borderColorPalette,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value + 'B';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '销售额: $' + context.raw + '十亿';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 4. 主要电商平台市场份额对比
+            const platformCtx = document.getElementById('platformChart').getContext('2d');
+            const platformChart = new Chart(platformCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['亚马逊', '阿里巴巴', 'eBay', 'Wish', 'Shopee', 'Mercado Libre', 'Rakuten', 'Jumia'],
+                    datasets: [{
+                        label: '市场份额 (%)',
+                        data: [28, 24, 9, 7, 6, 5, 4, 2],
+                        backgroundColor: colorPalette,
+                        borderColor: borderColorPalette,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '市场份额: ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 5. 支付方式偏好饼图
+            const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+            const paymentChart = new Chart(paymentCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['信用卡', '数字钱包', '银行转账', '货到付款', '加密货币', '其他'],
+                    datasets: [{
+                        data: [42, 30, 14, 10, 2, 2],
+                        backgroundColor: colorPalette,
+                        borderColor: borderColorPalette,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 15,
+                                padding: 10
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 6. 购物设备使用趋势
+            const deviceCtx = document.getElementById('deviceChart').getContext('2d');
+            const deviceChart = new Chart(deviceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2019', '2020', '2021', '2022', '2023'],
+                    datasets: [
+                        {
+                            label: '移动端',
+                            data: [32, 38, 43, 48, 54],
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 2,
+                            tension: 0.3
+                        },
+                        {
+                            label: '桌面端',
+                            data: [60, 56, 52, 48, 43],
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 2,
+                            tension: 0.3
+                        },
+                        {
+                            label: '平板电脑',
+                            data: [8, 6, 5, 4, 3],
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 2,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stacked: false,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 7. 行业挑战与机遇雷达图
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            const radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        '市场增长潜力',
+                        '物流效率',
+                        '支付便捷性',
+                        '技术成熟度',
+                        '监管合规难度',
+                        '平台竞争',
+                        '消费者信任',
+                        '新兴市场机会'
+                    ],
+                    datasets: [
+                        {
+                            label: '行业现状',
+                            data: [80, 65, 75, 70, 45, 60, 70, 85],
+                            backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                            borderColor: 'rgba(37, 99, 235, 0.8)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(37, 99, 235, 1)'
+                        },
+                        {
+                            label: '2年后预测',
+                            data: [85, 75, 85, 80, 55, 65, 80, 90],
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            borderColor: 'rgba(16, 185, 129, 0.8)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20,
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '/100';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 标签切换交互
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有active类
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    // 为当前按钮添加active类
+                    this.classList.add('active');
+                    
+                    // 根据点击的tab切换数据
+                    const period = this.getAttribute('data-period');
+                    if (period === 'monthly') {
+                        // 更新为月度数据
+                        marketSizeChart.data.labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+                        marketSizeChart.data.datasets[0].data = [240, 235, 260, 280, 290, 305, 315, 320, 340, 360, 390, 410];
+                        marketSizeChart.update();
+                    } else if (period === 'quarterly') {
+                        // 恢复为季度数据
+                        marketSizeChart.data.labels = ['Q1 2021', 'Q2 2021', 'Q3 2021', 'Q4 2021', 'Q1 2022', 'Q2 2022', 'Q3 2022', 'Q4 2022', 'Q1 2023', 'Q2 2023'];
+                        marketSizeChart.data.datasets[0].data = [620, 645, 678, 742, 715, 740, 782, 860, 840, 875];
+                        marketSizeChart.update();
+                    }
+                });
+            });
+            
+            // 筛选器交互
+            const yearFilter = document.getElementById('yearFilter');
+            const regionFilter = document.getElementById('regionFilter');
+            
+            yearFilter.addEventListener('change', updateFilters);
+            regionFilter.addEventListener('change', updateFilters);
+            
+            function updateFilters() {
+                const year = yearFilter.value;
+                const region = regionFilter.value;
+                
+                // 在实际应用中，这里会根据选择的筛选条件从后端获取数据
+                // 在这个演示中，我们只是简单地调整一些数据来模拟筛选效果
+                
+                if (year === '2022') {
+                    // 调整区域图表数据
+                    regionChart.data.datasets[0].data = [40, 26, 22, 7, 5];
+                    regionChart.update();
+                    
+                    // 调整品类图表数据
+                    categoryChart.data.datasets[0].data = [920, 680, 480, 350, 240, 180];
+                    categoryChart.update();
+                } else if (year === '2021') {
+                    // 调整区域图表数据
+                    regionChart.data.datasets[0].data = [38, 28, 21, 8, 5];
+                    regionChart.update();
+                    
+                    // 调整品类图表数据
+                    categoryChart.data.datasets[0].data = [850, 620, 430, 320, 220, 160];
+                    categoryChart.update();
+                } else {
+                    // 恢复2023年数据
+                    regionChart.data.datasets[0].data = [42, 25, 21, 8, 4];
+                    regionChart.update();
+                    
+                    categoryChart.data.datasets[0].data = [980, 720, 510, 380, 260, 190];
+                    categoryChart.update();
+                }
+                
+                // 根据地区筛选调整平台图表
+                if (region === 'asia') {
+                    platformChart.data.datasets[0].data = [18, 35, 6, 8, 14, 2, 12, 1];
+                    platformChart.update();
+                } else if (region === 'europe') {
+                    platformChart.data.datasets[0].data = [32, 15, 16, 10, 2, 1, 3, 0];
+                    platformChart.update();
+                } else if (region === 'namerica') {
+                    platformChart.data.datasets[0].data = [42, 12, 14, 6, 1, 4, 1, 0];
+                    platformChart.update();
+                } else {
+                    // 恢复全球数据
+                    platformChart.data.datasets[0].data = [28, 24, 9, 7, 6, 5, 4, 2];
+                    platformChart.update();
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
