@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "截屏分析助手",
+  "description": "自动截取网页并使用Deepseek AI进行图像分析",
+  "version": "1.0",
+  "action": {
+    "default_title": "截屏分析助手",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "contextMenus",
+    "tabs",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["sidebar.html", "css/*", "js/*", "images/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidebar.html"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "打开截屏分析助手"
+    },
+    "take_screenshot": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+X"
+      },
+      "description": "立即截取当前页面"
+    }
+  }
+} 

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>截屏分析助手</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-camera-retro"></i> 截屏分析助手</h1>
+    </header>
+
+    <section class="screenshot-controls">
+      <button id="manualScreenshot" class="btn primary-btn" style="width:100%; margin-bottom:10px;">
+        <i class="fas fa-camera"></i> 手动截屏
+      </button>
+      <div class="auto-screenshot">
+        <button id="toggleAutoScreenshot" class="btn primary-btn">
+          <i class="fas fa-clock"></i> 自动截屏
+        </button>
+        <div class="interval-control">
+          <label for="interval">间隔:</label>
+          <input type="number" id="interval" min="1" max="60" value="5">
+          <span>分钟</span>
+        </div>
+        <button id="startScreenshot" class="btn action-btn">
+          <i class="fas fa-play"></i> 开始
+        </button>
+      </div>
+      <div id="countdown" class="countdown hidden">
+        <span>下次截图: </span>
+        <span id="countdownTime">05:00</span>
+      </div>
+    </section>
+
+    <section class="screenshot-preview">
+      <h2><i class="fas fa-images"></i> 截图预览</h2>
+      <div id="thumbnailContainer" class="thumbnail-container">
+        <!-- 截图缩略图将在这里动态加载 -->
+        <div class="empty-state">
+          <i class="fas fa-photo-film fa-2x"></i>
+          <p>暂无截图</p>
+          <button id="takeScreenshot" class="btn secondary-btn">
+            <i class="fas fa-camera"></i> 立即截图
+          </button>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button id="analyzeScreenshot" class="btn action-btn" disabled>
+          <i class="fas fa-magnifying-glass"></i> 分析选中截图
+        </button>
+        <button id="deleteScreenshot" class="btn danger-btn" disabled>
+          <i class="fas fa-trash"></i> 删除选中截图
+        </button>
+      </div>
+    </section>
+
+    <footer>
+      <button id="openSettings" class="footer-btn">
+        <i class="fas fa-gear"></i> 设置
+      </button>
+      <button id="exportScreenshots" class="footer-btn">
+        <i class="fas fa-file-export"></i> 导出截图
+      </button>
+      <button id="showHelp" class="footer-btn">
+        <i class="fas fa-circle-question"></i> 帮助
+      </button>
+    </footer>
+  </div>
+
+  <!-- 设置模态窗口 -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-gear"></i> 设置</h2>
+        <button id="closeSettings" class="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-group">
+          <h3>DeepSeek API设置</h3>
+          
+          <div class="form-group">
+            <label for="apiKey">API Key:</label>
+            <input type="password" id="apiKey" placeholder="请输入您的DeepSeek API Key">
+          </div>
+          
+          <div class="form-group">
+            <label for="apiEndpoint">API端点:</label>
+            <input type="text" id="apiEndpoint" value="https://api.deepseek.com/v1">
+          </div>
+          
+          <div class="form-group">
+            <label for="apiModel">模型:</label>
+            <select id="apiModel">
+              <option value="deepseek-vision-1.0">deepseek-vision-1.0</option>
+              <option value="deepseek-vision-pro">deepseek-vision-pro</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="saveDirectory">截图保存目录:</label>
+            <div class="directory-selection">
+              <input type="text" id="saveDirectory" value="/screenshots" readonly>
+              <button id="browseDirectory" class="btn secondary-btn">浏览...</button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="language">分析语言:</label>
+            <select id="language">
+              <option value="zh-CN">简体中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveSettings" class="btn primary-btn">
+          <i class="fas fa-save"></i> 保存设置
+        </button>
+        <button id="resetSettings" class="btn secondary-btn">
+          <i class="fas fa-rotate"></i> 恢复默认
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 图片预览模态窗口 -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content preview-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-photo-film"></i> 截图预览</h2>
+        <button id="closePreview" class="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="image-preview">
+          <img id="previewImage" src="" alt="截图预览">
+        </div>
+        <div class="image-info">
+          <p><strong>日期:</strong> <span id="previewDate"></span></p>
+          <p><strong>网址:</strong> <span id="previewUrl"></span></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="previewAnalyze" class="btn primary-btn">
+          <i class="fas fa-magnifying-glass"></i> 分析
+        </button>
+        <button id="previewDelete" class="btn danger-btn">
+          <i class="fas fa-trash"></i> 删除
+        </button>
+        <button id="previewExport" class="btn secondary-btn">
+          <i class="fas fa-file-export"></i> 导出
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 图片分析模态窗口 -->
+  <div id="analysisModal" class="modal">
+    <div class="modal-content analysis-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-magnifying-glass"></i> 图片分析</h2>
+        <button id="closeAnalysis" class="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="image-preview">
+          <img id="analysisImage" src="" alt="截图分析">
+        </div>
+        <div class="analysis-results">
+          <h3><i class="fas fa-list-check"></i> 分析结果</h3>
+          <div id="analysisResults" class="results-container">
+            <div class="loading-indicator">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>正在分析中，请稍候...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="copyAnalysis" class="btn primary-btn">
+          <i class="fas fa-copy"></i> 复制分析结果
+        </button>
+        <button id="reanalyze" class="btn secondary-btn">
+          <i class="fas fa-rotate"></i> 重新分析
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 帮助模态窗口 -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-circle-question"></i> 帮助</h2>
+        <button id="closeHelp" class="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="help-section">
+          <h3>快速入门</h3>
+          <ol>
+            <li>点击"立即截图"按钮手动截取当前页面</li>
+            <li>设置自动截屏间隔，点击"开始"启动自动截图</li>
+            <li>点击缩略图查看截图详情</li>
+            <li>选择截图后点击"分析"使用DeepSeek AI进行图像分析</li>
+          </ol>
+        </div>
+        <div class="help-section">
+          <h3>快捷键</h3>
+          <ul>
+            <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>：打开截屏分析助手</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>X</kbd>：立即截取当前页面</li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h3>关于</h3>
+          <p>截屏分析助手 v1.0</p>
+          <p>基于DeepSeek AI技术提供图像分析能力</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+  <script src="js/screenshots.js"></script>
+  <script src="js/analysis.js"></script>
+</body>
+</html> 
